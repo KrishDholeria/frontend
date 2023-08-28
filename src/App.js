@@ -53,6 +53,44 @@ function App() {
     setNotes(notes.filter((note) => note._id!== _id));
   };
 
+  const updateNote = async (e) => {
+    e.preventDefault();
+    const {title, body} = updateForm;
+    await axios.put(`http://localhost:3000/notes/${updateForm._id}`, {title, body });
+    const newNotes = [...notes];
+    const index = notes.findIndex((note) => {
+      return note._id === updateForm._id;
+    });
+    newNotes[index] = {title, body};
+    console.log(newNotes);
+    setNotes(newNotes);
+
+    //clear update form state
+    setUpdateForm({
+      _id:null,
+      title:"",
+      body:"",
+    });
+  };
+
+  const toggleUpdate = (note) => {
+    //set note value on state
+    setUpdateForm({
+      _id:note._id,
+      title:note.title,
+      body:note.body,
+    });
+  };
+
+  const handleFeildChange = (e) => {
+    const {name, value} = e.target;
+
+    setUpdateForm({
+      ...updateForm,
+      [name]: value,
+    });
+  };
+
   return (
     <div className="App">
       <div>
@@ -61,7 +99,9 @@ function App() {
           // console.log(note);
             return (
               <div key={note._id}>
-                <h3>{note.title}</h3><button onClick={() => deleteNotes(note._id)} value={note._id} name="deleteNote">Delete</button>
+                <h3>{note.title}</h3>
+                <button onClick={() => deleteNotes(note._id)} name="deleteNote">Delete</button>
+                <button onClick={() => toggleUpdate(note)}>Update</button>
                 <p>{note.body}</p>
               </div>
             )
@@ -69,23 +109,23 @@ function App() {
         }
       </div>
 
-      <div>
+      {updateForm._id && (<div>
         <h2>Update Note:</h2>
-        <form>
-          <input name="title" value={updateForm.title}/>
-          <textarea name="body" value={updateForm.body }/>
+        <form onSubmit={updateNote}>
+          <input onChange={handleFeildChange} name="title" value={updateForm.title}/>
+          <textarea onChange={handleFeildChange} name="body" value={updateForm.body }/>
           <button type="submit">Update Note</button>
         </form>
-      </div>
+      </div>)}
 
-      <div>
+      {!updateForm._id && (<div>
         <h2>Add New Note:</h2>
         <form onSubmit={createNote}>
           <input onChange={updateCreateFormFeild} type="text" value={createForm.title} name="title"/>
           <textarea onChange={updateCreateFormFeild} name="body" value={createForm.body}/>
           <button type="submit">Create Note</button>
         </form>
-      </div>
+      </div>)}
     </div>
   );
 }
