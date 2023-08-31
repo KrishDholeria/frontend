@@ -16,7 +16,7 @@ const notesStore = create((set) => ({
 
     fetchNotes: async () => {
         // fetch the notes
-        const res = await axios.get('http://localhost:3000/notes');
+        const res = await axios.get('/notes');
         // set on state
         set({
             notes: res.data.notes,
@@ -39,7 +39,7 @@ const notesStore = create((set) => ({
         e.preventDefault();
         // create the note
         const {createForm, notes} = notesStore.getState();
-        const res = await axios.post('http://localhost:3000/notes', createForm);
+        const res = await axios.post('/notes', createForm);
         set({
             notes: [...notes, res.data.note],
             createForm: {
@@ -49,7 +49,7 @@ const notesStore = create((set) => ({
         });
     },
     deleteNotes: async (_id) => {
-        await axios.delete(`http://localhost:3000/notes/${_id}`);
+        await axios.delete(`/notes/${_id}`);
         const {notes} = notesStore.getState();
         set({
             notes: notes.filter((note) => note._id!== _id),
@@ -73,7 +73,7 @@ const notesStore = create((set) => ({
         e.preventDefault();
         const {updateForm, notes} = notesStore.getState();
         const {title, body} = updateForm;
-        await axios.put(`http://localhost:3000/notes/${updateForm._id}`, {title, body });
+        await axios.put(`/notes/${updateForm._id}`, {title, body });
         const newNotes = [...notes];
         const index = notes.findIndex((note) => {
           return note._id === updateForm._id;
